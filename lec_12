@@ -1,0 +1,44 @@
+import random
+import time
+
+def measure_time(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(f"{func.__name__} executed in {execution_time:.4f} seconds")
+        return result
+    return wrapper
+
+def generate_file(filename):
+    with open(filename, 'w') as file:
+        for _ in range(100):
+            line = ' '.join(str(random.randint(1, 100)) for _ in range(20))
+            file.write(line + '\n')
+
+@measure_time
+def process_file(filename):
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+
+    integer_arrays = list(map(lambda line: list(map(int, line.split())), lines))
+
+    filtered_arrays = list(map(lambda arr: list(filter(lambda num: num > 40, arr)), integer_arrays))
+
+    with open(filename, 'w') as file:
+        for arr in filtered_arrays:
+            line = ' '.join(map(str, arr))
+            file.write(line + '\n')
+
+def read_file_generator(filename):
+    with open(filename, 'r') as file:
+        for line in file:
+            yield line.strip()
+
+generate_file('data.txt')
+
+process_file('data.txt')
+
+for line in read_file_generator('data.txt'):
+    print(line)
